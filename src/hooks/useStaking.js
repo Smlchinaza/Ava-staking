@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getContract, formatEther, parseEther, getProvider, switchToAvalancheNetwork } from '../utils/web3';
+import { getContract, formatEther, parseEther, getProvider, switchToAvalancheNetwork, calculateAPR } from '../utils/web3';
 
 // Use environment variable for contract address
 const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS || process.env.CONTRACT_ADDRESS;
@@ -162,24 +162,40 @@ export const useStaking = () => {
         }
     }, [stakingContract]);
     
-    // Fetch total staked amount
+    // Fetch total staked amount and calculate APR
     const fetchTotalStaked = useCallback(async () => {
         if (!stakingContract) return;
         try {
-            const total = await stakingContract.totalStaked();
+            const total = await stakingContract.getTotalStaked();
+            const rewardsPerDay = await stakingContract.getRewardsPerDay();
             setTotalStakedAmount(formatEther(total));
+            setApr(calculateAPR(formatEther(rewardsPerDay), formatEther(total)));
         } catch (error) {
             console.error("Error fetching total staked:", error);
         }
     }, [stakingContract]);
-    
-    // Load all contract data
+
+    // Load contract data
     const loadContractData = useCallback(async () => {
-        await refreshStakeInfo();
-        await fetchAPR();
-        await fetchMinimumStake();
-        await fetchTotalStaked();
-    }, [refreshStakeInfo, fetchAPR, fetchMinimumStake, fetchTotalStaked]);
+        if (!stakingContract) return;
+        try {
+            const [userStakeInfo, minStake] = await Promise.all([
+                stakingContract.getStakeInfo(),
+                stakingContract.getMinimumStakeAmount()
+            ]);
+            
+            setStakeInfo({
+                stakedAmount: formatEther(userStakeInfo.amount),
+                stakingSince: userStakeInfo.since.toString(),
+                rewards: formatEther(userStakeInfo.rewards)
+            });
+            
+            setMinimumStakeAmount(formatEther(minStake));
+            await fetchTotalStaked();
+        } catch (error) {
+            console.error("Error loading contract data:", error);
+        }
+    }, [stakingContract, fetchTotalStaked]);
     
     // Load data when contract is initialized
     useEffect(() => {

@@ -14,7 +14,9 @@ const StakingForm = () => {
         stakeInfo, 
         isLoading, 
         networkError,
-        minimumStakeAmount
+        minimumStakeAmount,
+        apr,
+        totalStakedAmount
     } = useStaking();
 
     // Clear messages after 5 seconds
@@ -110,6 +112,18 @@ const StakingForm = () => {
     return (
         <div className="bg-gray-800 rounded-xl p-6 max-w-md mx-auto">
             <h2 className="text-2xl font-bold mb-6 text-center">Stake AVAX</h2>
+            
+            {/* APR Display */}
+            <div className="mb-6 p-4 bg-gray-700/50 rounded-lg">
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-300">Current APR</span>
+                    <span className="text-2xl font-bold text-green-400">{apr}%</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-300">Total Staked</span>
+                    <span className="text-lg text-gray-200">{totalStakedAmount} AVAX</span>
+                </div>
+            </div>
             
             {networkError && (
                 <div className="mb-4 p-3 bg-red-900/50 text-red-200 rounded-lg">

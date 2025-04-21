@@ -70,6 +70,19 @@ export const switchToAvalancheNetwork = async () => {
     }
 };
 
+export const calculateAPR = (rewardsPerDay, totalStaked) => {
+    if (!totalStaked || parseFloat(totalStaked) === 0) return "0";
+    
+    // Convert rewards per day to yearly rewards
+    const yearlyRewards = parseFloat(rewardsPerDay) * 365;
+    
+    // Calculate APR: (yearly rewards / total staked) * 100
+    const apr = (yearlyRewards / parseFloat(totalStaked)) * 100;
+    
+    // Return formatted APR with 2 decimal places
+    return apr.toFixed(2);
+};
+
 export const getExplorerUrl = (txHash) => {
     return `https://testnet.snowtrace.io/tx/${txHash}`;
 };

@@ -3,6 +3,7 @@ import StakingForm from "./components/StakingForm";
 import StakeDashboard from "./components/StakeDashboard";
 import { useStaking } from "./hooks/useStaking";
 import { switchToAvalancheNetwork } from "./utils/web3";
+import APRCalculator from "./components/APRCalculator";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
@@ -210,7 +211,7 @@ function App() {
         
         {/* Not Connected Message */}
         {!isConnected && (
-          <div className="text-center p-8 bg-gray-800/50 rounded-xl max-w-2xl mx-auto">
+          <div className="text-center p-8 bg-gray-800/50 rounded-xl max-w-2xl mx-auto mb-8">
             <svg className="w-16 h-16 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
             </svg>
@@ -221,6 +222,12 @@ function App() {
             </p>
           </div>
         )}
+
+        {/* APR Calculator - Always visible */}
+        <div className="px-4 mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-center">Estimate Your Returns</h2>
+          <APRCalculator />
+        </div>
       </div>
       
       {/* Footer */}
