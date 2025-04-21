@@ -43,6 +43,14 @@ function App() {
     }
   };
 
+  const disconnectWallet = () => {
+    setIsConnected(false);
+    setWalletAddress("");
+    setChainId(null);
+    // Note: We can't actually force MetaMask to disconnect
+    // We can only reset our app's connection state
+  };
+
   const handleAccountsChanged = (accounts) => {
     if (accounts.length > 0) {
       setIsConnected(true);
@@ -108,21 +116,27 @@ function App() {
           </div>
           
           {isConnected ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               <div className="px-3 py-1 bg-gray-800 rounded-full text-sm flex items-center">
                 <span className={`w-2 h-2 rounded-full mr-2 ${
                   chainId === '0xA86A' || chainId === '0xA869' 
                     ? 'bg-green-500' 
                     : 'bg-red-500'
                 }`}></span>
-                <span>{formatAddress(walletAddress)}</span>
+                {formatAddress(walletAddress)}
               </div>
+              <button
+                onClick={disconnectWallet}
+                className="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Disconnect
+              </button>
             </div>
           ) : (
             <button
               onClick={connectWallet}
               disabled={isConnecting}
-              className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-70 flex items-center"
+              className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center"
             >
               {isConnecting ? (
                 <>
@@ -152,7 +166,7 @@ function App() {
             <button
               onClick={connectWallet}
               disabled={isConnecting}
-              className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity transform hover:scale-105 duration-200 shadow-lg disabled:opacity-70 flex items-center mx-auto"
+              className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity transform hover:scale-105 duration-200 shadow-lg disabled:opacity-50 flex items-center mx-auto"
             >
               {isConnecting ? (
                 <>
@@ -212,7 +226,7 @@ function App() {
         {/* Not Connected Message */}
         {!isConnected && (
           <div className="text-center p-8 bg-gray-800/50 rounded-xl max-w-2xl mx-auto mb-8">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-16 h-16 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
             </svg>
             <h3 className="text-xl font-semibold mb-2">Connect Your Wallet</h3>
