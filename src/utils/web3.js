@@ -19,3 +19,68 @@ export const getProvider = () => {
     }
     return null;
 };
+
+// Avalanche Mainnet
+export const AVALANCHE_MAINNET_PARAMS = {
+    chainId: '0xA86A', // 43114 in hexadecimal
+    chainName: 'Avalanche Mainnet C-Chain',
+    nativeCurrency: {
+        name: 'Avalanche',
+        symbol: 'AVAX',
+        decimals: 18
+    },
+    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://snowtrace.io/']
+};
+
+// Avalanche Fuji Testnet
+export const AVALANCHE_FUJI_PARAMS = {
+    chainId: '0xA869', // 43113 in hexadecimal
+    chainName: 'Avalanche Fuji Testnet',
+    nativeCurrency: {
+        name: 'Avalanche',
+        symbol: 'AVAX',
+        decimals: 18
+    },
+    rpcUrls: ['https://api.avax-test.network/ext/bc/C/rpc'],
+    blockExplorerUrls: ['https://testnet.snowtrace.io/']
+};
+
+export const switchToAvalancheNetwork = async () => {
+    if (!window.ethereum) throw new Error("No crypto wallet found");
+    
+    try {
+        // Try to switch to the Avalanche network
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: AVALANCHE_MAINNET_PARAMS.chainId }],
+        });
+    } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask
+        if (switchError.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [AVALANCHE_MAINNET_PARAMS],
+                });
+            } catch (addError) {
+                throw new Error("Failed to add Avalanche network");
+            }
+        } else {
+            // Try Fuji testnet as fallback
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [AVALANCHE_FUJI_PARAMS],
+                });
+            } catch (addError) {
+                throw new Error("Failed to add Avalanche network");
+            }
+        }
+    }
+};
+
+export const getExplorerUrl = (txHash) => {
+    // Check if we're on mainnet or testnet
+    return `https://snowtrace.io/tx/${txHash}`;
+};
