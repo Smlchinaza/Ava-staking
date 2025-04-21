@@ -50,10 +50,10 @@ export const switchToAvalancheNetwork = async () => {
     if (!window.ethereum) throw new Error("No crypto wallet found");
     
     try {
-        // Try to switch to the Avalanche network
+        // Try to switch to the Avalanche Fuji Testnet
         await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: AVALANCHE_MAINNET_PARAMS.chainId }],
+            params: [{ chainId: AVALANCHE_FUJI_PARAMS.chainId }],
         });
     } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask
@@ -61,26 +61,15 @@ export const switchToAvalancheNetwork = async () => {
             try {
                 await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
-                    params: [AVALANCHE_MAINNET_PARAMS],
-                });
-            } catch (addError) {
-                throw new Error("Failed to add Avalanche network");
-            }
-        } else {
-            // Try Fuji testnet as fallback
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
                     params: [AVALANCHE_FUJI_PARAMS],
                 });
             } catch (addError) {
-                throw new Error("Failed to add Avalanche network");
+                throw new Error("Failed to add Avalanche Fuji Testnet");
             }
         }
     }
 };
 
 export const getExplorerUrl = (txHash) => {
-    // Check if we're on mainnet or testnet
-    return `https://snowtrace.io/tx/${txHash}`;
+    return `https://testnet.snowtrace.io/tx/${txHash}`;
 };
