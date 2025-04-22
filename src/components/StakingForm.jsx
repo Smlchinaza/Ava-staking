@@ -56,11 +56,21 @@ const StakingForm = () => {
         
         try {
             const tx = await stake(amount);
+            
+            // Only set tx hash after we have the transaction object
+            if (tx && tx.hash) {
+                setTxHash(tx.hash);
+            }
+            
+            // Wait for transaction confirmation
+            await tx.wait();
+            
+            // Only set success after confirmation
             setSuccess(`Successfully staked ${amount} AVAX`);
             setAmount('');
-            setTxHash(tx.hash);
         } catch (error) {
             setError(error.message);
+            setTxHash(''); // Clear tx hash if transaction failed
         }
     };
 

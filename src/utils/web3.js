@@ -1,8 +1,10 @@
 import { ethers } from 'ethers';
-import AvaStakingABI from '../abis/AvaStaking.json';
+import { CONTRACT_ABI } from './constants';
 
 export const getContract = (address, signer) => {
-    return new ethers.Contract(address, AvaStakingABI, signer);
+    if (!address) throw new Error("Contract address is required");
+    if (!signer) throw new Error("Signer is required");
+    return new ethers.Contract(address, CONTRACT_ABI, signer);
 };
 
 export const formatEther = (amount) => {
@@ -21,17 +23,17 @@ export const getProvider = () => {
 };
 
 // Avalanche Mainnet
-export const AVALANCHE_MAINNET_PARAMS = {
-    chainId: '0xA86A', // 43114 in hexadecimal
-    chainName: 'Avalanche Mainnet C-Chain',
-    nativeCurrency: {
-        name: 'Avalanche',
-        symbol: 'AVAX',
-        decimals: 18
-    },
-    rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
-    blockExplorerUrls: ['https://snowtrace.io/']
-};
+// export const AVALANCHE_MAINNET_PARAMS = {
+//     chainId: '0xA86A', // 43114 in hexadecimal
+//     chainName: 'Avalanche Mainnet C-Chain',
+//     nativeCurrency: {
+//         name: 'Avalanche',
+//         symbol: 'AVAX',
+//         decimals: 18
+//     },
+//     rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],
+//     blockExplorerUrls: ['https://snowtrace.io/']
+// };
 
 // Avalanche Fuji Testnet
 export const AVALANCHE_FUJI_PARAMS = {

@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getContract, formatEther, parseEther, getProvider, switchToAvalancheNetwork, calculateAPR } from '../utils/web3';
-
-// Use environment variable for contract address
-const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS || process.env.CONTRACT_ADDRESS;
+import { CONTRACT_ADDRESS } from '../utils/constants';
 
 export const useStaking = () => {
     const [stakingContract, setStakingContract] = useState(null);
@@ -33,19 +31,36 @@ export const useStaking = () => {
                         // Attempt to switch to Avalanche network
                         try {
                             await switchToAvalancheNetwork();
+                            // Wait for the network to actually change
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            // Get the new network after switching
+                            const newNetwork = await provider.getNetwork();
+                            if (newNetwork.chainId !== 43113) {
+                                throw new Error("Failed to switch to Avalanche network");
+                            }
                             setNetworkError(null);
                         } catch (switchError) {
                             console.error("Failed to switch network:", switchError);
+                            setNetworkError("Please manually switch to the Avalanche Fuji Testnet");
                             return;
                         }
                     }
                     
-                    const signer = provider.getSigner();
+                    const signer = await provider.getSigner();
+                    const address = await signer.getAddress();
                     const contract = getContract(CONTRACT_ADDRESS, signer);
-                    setStakingContract(contract);
                     
-                    // Set up event listeners
-                    setupEventListeners(contract);
+                    // Verify contract connection
+                    try {
+                        await contract.stakingToken();
+                        setStakingContract(contract);
+                        setNetworkError(null);
+                        // Set up event listeners
+                        setupEventListeners(contract);
+                    } catch (contractError) {
+                        console.error("Contract connection error:", contractError);
+                        setNetworkError("Contract not found on this network. Please check you're on Avalanche Fuji Testnet");
+                    }
                 }
             } catch (error) {
                 console.error("Error initializing contract:", error);
